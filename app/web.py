@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, render_template, request
 from .errors import DeskError
 from .input import sample, submission
 from .modules.archive.routes import store
-from .modules.evidence.service import index
+from .modules.evidence.service import index, reconcile
 from .pipeline import compute
 from .reasons import REASONS
 
@@ -48,5 +48,10 @@ def desk(key):
     files, stages, manifest, name = snapshot()
     context = dict(stages=stages, ledger=stages['ledger']['counts'], names=DESK, key=key, reasons=REASONS,
                    selected=name, manifest=manifest, archive=store().list() if key == 'archive' else [],
-                   report=index(files, dict(stages=stages, manifest=manifest)) if key == 'evidence' and manifest else None)
+                   report=None, decision=None)
+    if key == 'evidence' and manifest:
+        try:
+            context['report'] = index(files, dict(stages=stages, manifest=manifest))
+        except DeskError:
+            context['decision'] = reconcile(files, manifest, compute)
     return render_template('desk.html', **context)

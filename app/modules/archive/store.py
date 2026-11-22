@@ -23,6 +23,17 @@ class Archive:
             stored = db.execute('SELECT result FROM runs WHERE id=?', (key,)).fetchone()[0]
         return json.loads(stored), cursor.rowcount == 0
 
+    def restore(self, key, files, previous, result):
+        """仅当归档行仍是评估时所见内容才复原结果，保证证据编号不指向不同结论。"""
+        with closing(self.connect()) as db, db:
+            db.execute('BEGIN IMMEDIATE')
+            row = db.execute('SELECT inputs, result FROM runs WHERE id=?', (key,)).fetchone()
+            if row is None:
+                raise DeskError('NO_RUN', '归档不存在', 404)
+            if json.loads(row[0]) != files or json.loads(row[1]) != previous:
+                raise DeskError('RETRY', '归档已变化，请重试恢复', 409)
+            db.execute('UPDATE runs SET result=? WHERE id=?', (canonical(result), key))
+
     def get(self, key):
         with closing(self.connect()) as db:
             row = db.execute('SELECT inputs, result FROM runs WHERE id=?', (key,)).fetchone()

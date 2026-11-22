@@ -12,7 +12,7 @@
 | M4 错载与漏扫归因 | 按牌追踪待证与错装 | `/desk/exceptions` `/api/stage/exceptions` | `app/modules/exceptions/service.py` | `tests/test_exceptions.py` |
 | M5 行李去向对账 | 勾稽计划段与去向件数 | `/` `/api/stage/ledger` | `app/modules/ledger/service.py` | `tests/test_ledger.py` |
 | M6 批次留档复跑 | 保存并复算原件 | `/desk/archive` `POST /api/archive` | `app/modules/archive/service.py` `app/modules/archive/store.py` | `tests/test_archive.py` |
-| M7 联程证据签发 | 验摘要并下载联程证据 | `/desk/evidence` `/api/evidence/<run>/export` | `app/modules/evidence/bundle.py` | `tests/test_evidence.py` |
+| M7 联程证据签发 | 验摘要并下载联程证据，按复算对账恢复或停签 | `/desk/evidence` `/api/evidence/<run>/export` `POST /api/evidence/<run>/recover` | `app/modules/evidence/bundle.py` `app/modules/evidence/service.py` | `tests/test_evidence.py` `tests/test_recovery.py` |
 
 ## 陷阱登记
 
